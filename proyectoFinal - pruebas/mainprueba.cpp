@@ -8,20 +8,22 @@ using namespace voyADemolerlo;
 
 int main(){
 
-    #define JUMP -27
-    #define escala 2.5
-    #define aceleracion 10
+    #define v 10
+    #define escala 1.8
 
     Personaje felix;
     MiniWinImage felixjr("felixstand.bmp", "felixstandmask.bmp");
     MiniWinImage felixjrleft("felixstandleft.bmp", "felixstandleftmask.bmp");
     MiniWinImage felixjrmove("felixmove.bmp", "felixmovemask.bmp");
     MiniWinImage felixjrmoveleft("felixmoveleft.bmp", "felixmoveleftmask.bmp");
+    MiniWinImage speech("felixdialogue.bmp", "felixdialoguemask.bmp");
     MiniWinImage edificio("EdificioRalph.bmp");
 
     bool move = false;
     bool izq = false;
     bool der = false;
+    bool secreto = false;
+    bool condicion = true;
 
     int t;
     bool on = false;
@@ -33,8 +35,7 @@ int main(){
     float x = 0, y = 0;
 
 
-    titulo("Reparalo Felix Jr.");
-    // 52, 37
+    titulo("Repara Felix Jr.");
     ventana(escala * 739, escala * 376);
     color_fondo(Colores::NEGRO);
 
@@ -47,6 +48,8 @@ int main(){
     felixjrmoveleft.ancho(felixjrmoveleft.ancho() * escala);
     felixjrleft.alto(felixjrleft.alto() * escala);
     felixjrleft.ancho(felixjrleft.ancho() * escala);
+    speech.alto((speech.alto() / 2) * escala);
+    speech.ancho((speech.ancho() / 2) * escala);
 
     y = valto() - felixjr.alto();
 
@@ -54,39 +57,48 @@ int main(){
     /*-----------------------Tamaños de foto de edificio-----------------------------*/
     edificio.alto(edificio.alto() * escala);
     edificio.ancho(edificio.ancho() * escala);
-        
 
     t = tecla();
-    while( t != Teclas::F4){
-
-        felixjr.posX(0);
-        felixjr.posY(valto());
-        felixjrmove.posX(0);
-        felixjrmove.posY(valto());
-        felixjrleft.posX(0);
-        felixjrleft.posY(valto());
-        felixjrmoveleft.posX(0);
-        felixjrmoveleft.posY(valto());
-
-        if (y + felixjr.alto() > valto())
-            y = valto() - felixjr.alto();
-        if (i_presionada)
-            x -= 27;
-        if (x < 0)
-            x = 0;
-        if (d_presionada)
-            x += 27;
-        if (x + felixjr.ancho() > vancho())
-            x = vancho() - felixjr.ancho();
-        if (ar_presionada)
-            y += JUMP;
-        if (ab_presionada)
-            y -= JUMP;
+    
+    while( t != Teclas::ESCAPE){        
+        
+        if (x + felixjr.ancho() > vancho()){
+            x = vancho() - felixjr.ancho();}
+        if (i_presionada){
+            x -= v*escala*3.5;
+            i_presionada = false;
+            }
+        if (x < 0){
+            x = 0;}
+        if (d_presionada){
+            x += v*escala*3.5;
+            d_presionada = false;
+            }
+        if (y + felixjr.alto() > valto()){
+            y = valto() - felixjr.alto();}
+        if (ar_presionada){
+            y += -v*escala*5.3;
+            ar_presionada = false;
+            }
+        if (y < 0){
+            y = 0;}
+        if (ab_presionada){
+            y -= -v*escala*5.3;
+            ab_presionada = false;
+            }
+            
+        if((y + felixjr.alto()) < (valto() - felixjr.alto() - 1)){
+            if (x < (v*escala*3.5*8)){
+                x = (v*escala*3.5*8);
+                }
+            if((x + felixjr.ancho()) < (vancho() - v*escala*3.5*8)){}
+            else{
+                x = (vancho() - v*escala*3.5*8 - felixjr.ancho());
+            }
+        }
 
         borra();
         color(NEGRO);
-
-        // rectangulo_lleno(x,y,x+50,y+50);
 
         /*-----------Posición de felix---------------------------*/
         felixjr.posX(x);
@@ -97,88 +109,116 @@ int main(){
         felixjrleft.posY(y);
         felixjrmoveleft.posX(x);
         felixjrmoveleft.posY(y);
-        /*-----------Posición de felix---------------------------*/
 
-        // Imagen TEST
+        // Mostrar Imagen
         muestraImagen(edificio);
 
 
-        t = teclaDown();
+            t = teclaDown();
 
-        if(t == RETURN) {
-            on = !on;
-            fullscreen(on);
-        }
+            if(t == RETURN) {
+                on = !on;
+                fullscreen(on);
+                secreto = true;
+            }
 
-        if (t == IZQUIERDA)
-        {
-            i_presionada = true;
-            move = true;
-            der = false;
-            izq = true;
-        }
-        if (t == DERECHA)
-        {
-            d_presionada = true;
-            move = true;
-            izq = false;
-            der = true;
-        }
-        if (t == ARRIBA)
-        {
-            ar_presionada = true;
-        }
-        if (t == ABAJO)
-        {
-            ab_presionada = true;
-        }
-        if (t == ESPACIO)
-        {
-            repara = true;
-        }
+            if (t == IZQUIERDA)
+            {
+                i_presionada = true;
+                move = true;
+                der = false;
+                izq = true;
+            }
+            if (t == DERECHA)
+            {
+                d_presionada = true;
+                move = true;
+                izq = false;
+                der = true;
+            }
+            if (t == ARRIBA)
+            {
+                ar_presionada = true;
+            }
+            if (t == ABAJO)
+            {
+                ab_presionada = true;
+            }
+            if (t == ESPACIO)
+            {
+                repara = true;
+            }
 
-        t = teclaUp();
-        if (t == IZQUIERDA)
-        {
-            i_presionada = false;
-            izq = true;
-            der = false;
-            move = false;
-        }
-        if (t == DERECHA)
-        {
-            d_presionada = false;
-            der = true;
-            izq = false;
-            move = false;
-        }
-        if (t == ARRIBA)
-        {
-            ar_presionada = false;
-        }
-        if (t == ABAJO)
-        {
-            ab_presionada = false;
-        }
+            t = teclaUp();
+            if (t == IZQUIERDA)
+            {
+                i_presionada = false;
+                izq = true;
+                der = false;
+                move = false;
+            }
+            if (t == DERECHA)
+            {
+                d_presionada = false;
+                der = true;
+                izq = false;
+                move = false;
+            }
+            if (t == ARRIBA)
+            {
+                ar_presionada = false;
+            }
+            if (t == ABAJO)
+            {
+                ab_presionada = false;
+            }
 
-        if(move){
-            if(izq){
-                muestraImagen(felixjrmoveleft);
-            } else {
+            if(move){
+                if(izq){
+                    muestraImagen(felixjrmoveleft);
+                }
+                else{
+                    muestraImagen(felixjrmove);
+                }
+            }
+            else {
+                if(izq){
+                    muestraImagen(felixjrleft);
+                }
+                else{
+                    muestraImagen(felixjr);
+                }
+            }
+
+            if (secreto){
+                color(ROJO);
+                rectangulo_lleno(vancho()-50,valto()-70,vancho(),valto());
+            }
+
+        if(condicion){
+            refresca();
+            espera(1000);
+            speech.posX(felixjr.posX()+2);
+            speech.posY(felixjr.posY()-30);
+            muestraImagen(speech);
+            refresca();
+            espera(2000);
+            for (int i = 0; i < (28.5 * escala); i++){
+                x += v;
+                felixjrmove.posX(x);
+                felixjrmove.posY(y);
                 muestraImagen(felixjrmove);
+                refresca();
+                espera(1);
+                borra();
+                muestraImagen(edificio);
             }
-        } else {
-            if(izq){
-                muestraImagen(felixjrleft);
-            } else {
-                muestraImagen(felixjr);
-            }
+            condicion = false;
         }
-
+        
         refresca();
         espera(1);
     }
-    
     cierra();
 
     return 0;
